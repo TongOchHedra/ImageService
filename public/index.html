@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bildredigerare</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Ladda upp och redigera bilder</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Ladda upp bild</button>
+    </form>
+
+    <h2>Redigera bild</h2>
+    <form id="editForm">
+        <input type="text" id="text" placeholder="Text" required>
+        <input type="number" id="x" placeholder="X-koordinat" required>
+        <input type="number" id="y" placeholder="Y-koordinat" required>
+        <button type="submit">Lägg till text</button>
+    </form>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            alert(await response.text());
+        });
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('text').value;
+            const x = parseInt(document.getElementById('x').value);
+            const y = parseInt(document.getElementById('y').value);
+            const response = await fetch('/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ imagePath: 'uploads/your-image.png', text, x, y })
+            });
+            const data = await response.json();
+            alert(`Bilden har redigerats: ${data.editedImagePath}`);
+        });
+    </script>
+</body>
+</html>
